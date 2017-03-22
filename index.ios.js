@@ -8,6 +8,7 @@ import {
   TextInput,
   Button
 } from 'react-native';
+import Translate from './Translate/Translate.js'
 
 class purple extends Component {
   constructor(props) {
@@ -49,6 +50,7 @@ class purple extends Component {
             onPress={this.sendPhoto}
             title="Send"
           />
+        <Translate />
       </View>
     );
   }
