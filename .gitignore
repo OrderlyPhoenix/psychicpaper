@@ -51,3 +51,8 @@ buck-out/
 fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots
+
+.vscode
+
+ios/purple.xcodeproj/project.pbxproj
+ios/purple.xcodeproj/xcshareddata/xcschemes/purple.xcscheme
