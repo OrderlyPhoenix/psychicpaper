@@ -6,21 +6,26 @@ import {
   View,
   Image,
   TextInput,
-  Button
+  Button,
+  CameraRoll,
+  ScrollView,
+  TouchableHighlight,
+  ImagePickerIOS,
 } from 'react-native';
 
-class purple extends Component {
+export default class purple extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      text: 'Photo URL'
+      image: null,
+      text: ''
     };
 
-    this.sendPhoto = this.sendPhoto.bind(this);
-    this.sendPhoto();
+    this.sendText = this.sendText.bind(this);
+    this.pickImage = this.pickImage.bind(this);
   }
 
-  sendPhoto() {
+  sendText() {
     return fetch('http://127.0.0.1:8080/api/upload', {
       method: 'POST',
       headers: {
@@ -38,17 +43,25 @@ class purple extends Component {
     .catch(err => console.log('error1!!: ', err));
   }
 
+  pickImage() {
+    ImagePickerIOS.openSelectDialog(
+      {}, 
+      imageUri => {this.setState({ image: imageUri }); console.log('IMAGE: ', this.state.image)}, 
+      error => console.log(error)
+    );
+  }
+
   render() {
     return (
-      <View>
-        <Text style={styles.main}>Translate a picture</Text>
+      <View style={styles.container}>
+        <Text style={styles.main}>Translate a Photo</Text>
+        <Text style={styles.section}>Choose photo from URL</Text>
         <TextInput style={styles.input}
           onChangeText={(text) => this.setState({text})}
-          value={this.state.text} />
-          <Button
-            onPress={this.sendPhoto}
-            title="Send"
-          />
+          value={this.state.text} placeholder="URL" />
+        <Button title="Send URL" onPress={this.sendText} />
+        <Text style={styles.section}>Choose photo from library</Text>
+        <Button title="Open photo library" onPress={this.pickImage} />
       </View>
     );
   }
@@ -56,17 +69,28 @@ class purple extends Component {
 
 const styles = StyleSheet.create({
   main: {
-    fontSize: 20,
+    fontSize: 24,
     justifyContent: 'center',
     textAlign: 'center',
     marginTop: 30,
+    marginBottom: 30
+  },
+  section: {
+    fontSize: 20,
+    justifyContent: 'center',
+    textAlign: 'center',
+    marginTop: 20
   },
   input: {
     height: 40, 
     borderColor: 'gray', 
     borderWidth: 1,
-    marginTop: 20,
-    marginBottom: 20
+    marginTop: 5,
+    marginBottom: 5
+  },
+    container: {
+    flex: 1,
+    // backgroundColor: '#1CABBD',
   }
 });
 
