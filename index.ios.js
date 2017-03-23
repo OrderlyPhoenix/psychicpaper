@@ -14,7 +14,9 @@ class purple extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      text: 'Photo URL'
+      text: 'https://facebook.github.io/react/img/logo_og.png',
+      // need to get rid of this in the future
+      showTranslation: false
     };
 
     this.sendPhoto = this.sendPhoto.bind(this);
@@ -22,21 +24,25 @@ class purple extends Component {
   }
 
   sendPhoto() {
-    return fetch('http://127.0.0.1:8080/api/upload', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        url: this.state.text
-      })
-    })
-    .then((response) => response.json())
-    .then((responseJson) => {
-        console.log('RESPONSE: ', responseJson);
-    })
-    .catch(err => console.log('error1!!: ', err));
+    // return fetch('http://127.0.0.1:8080/api/upload', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Accept': 'application/json',
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({
+    //     url: this.state.text
+    //   })
+    // })
+    // .then((response) => response.json())
+    // .then((responseJson) => {
+    //   // this needs to be changed in the future
+        this.setState({
+          showTranslation: true
+        });
+    //     console.log('RESPONSE: ', responseJson);
+    // })
+    // .catch(err => console.log('error1!!: ', err));
   }
 
   render() {
@@ -50,7 +56,8 @@ class purple extends Component {
             onPress={this.sendPhoto}
             title="Send"
           />
-        <Translate />
+        {/*this will need to be changed in the future*/}
+        {this.state.showTranslation ?  <Translate imgURL={this.state.text}/> : null}
       </View>
     );
   }
