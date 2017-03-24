@@ -12,8 +12,8 @@ import {
   TouchableHighlight,
   ImagePickerIOS,
 } from 'react-native';
-const RNFS = require('react-native-fs');
 import RNFetchBlob from 'react-native-fetch-blob';
+import Camera from 'react-native-camera';
 
 export default class purple extends Component {
   constructor(props) {
@@ -23,11 +23,13 @@ export default class purple extends Component {
       text: '',
       keywords: null,
       urlImage: null,
+      cameraType: Camera.constants.Type.back
     };
 
     this.sendText = this.sendText.bind(this);
     this.pickImage = this.pickImage.bind(this);
     this.sendPhoto = this.sendPhoto.bind(this);
+    this.takePicture = this.takePicture.bind(this);
   }
 
   sendText() {
@@ -75,8 +77,18 @@ export default class purple extends Component {
     );
   }
 
+  takePicture() {
+      const options = {};
+      //options.location = ...
+      this.camera.capture({metadata: options})
+        .then((data) => console.log(data))
+        .catch(err => console.error(err));
+    }
+  
+
   render() {
     return (
+      <ScrollView>
       <View style={styles.container}>
         <Text style={styles.main}>Translate a Photo</Text>
         <Text style={styles.section}>Choose photo from URL</Text>
@@ -99,7 +111,18 @@ export default class purple extends Component {
         <View> 
           {this.state.keywords ? this.state.keywords.map((word) => <Text>{word.class} {word.score}</Text>) : null}
         </View>
+        <View style={styles.container}>
+        <Camera
+            ref={(cam) => {
+              this.camera = cam;
+            }}
+            style={styles.preview}
+            aspect={Camera.constants.Aspect.fill}>
+            <Text onPress={this.takePicture}>[CAPTURE]</Text>
+          </Camera>
+        </View>
       </View>
+      </ScrollView>
     );
   }
 }
@@ -133,6 +156,13 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     margin: 10,
+  },
+   preview: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    width: 400,
+    height: 400
   }
 });
 
