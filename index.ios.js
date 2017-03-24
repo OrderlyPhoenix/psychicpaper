@@ -23,13 +23,15 @@ export default class purple extends Component {
       text: '',
       keywords: null,
       urlImage: null,
-      cameraType: Camera.constants.Type.back
+      cameraType: Camera.constants.Type.back,
+      showCamera: false
     };
 
     this.sendText = this.sendText.bind(this);
     this.pickImage = this.pickImage.bind(this);
     this.sendPhoto = this.sendPhoto.bind(this);
     this.takePicture = this.takePicture.bind(this);
+    this.openCamera = this.openCamera.bind(this);
   }
 
   sendText() {
@@ -79,12 +81,19 @@ export default class purple extends Component {
 
   takePicture() {
       const options = {};
-      //options.location = ...
       this.camera.capture({metadata: options})
-        .then((data) => console.log(data))
+        .then((data) => this.setState({image: data.path}))
         .catch(err => console.error(err));
+      this.setState({
+        showCamera: false
+      })
     }
   
+  openCamera() {
+    this.setState({
+      showCamera: true
+    });
+  }
 
   render() {
     return (
@@ -111,6 +120,10 @@ export default class purple extends Component {
         <View> 
           {this.state.keywords ? this.state.keywords.map((word) => <Text>{word.class} {word.score}</Text>) : null}
         </View>
+        
+        <Button title="Open camera" onPress={this.openCamera} />
+
+        {this.state.showCamera ?  
         <View style={styles.container}>
         <Camera
             ref={(cam) => {
@@ -118,9 +131,10 @@ export default class purple extends Component {
             }}
             style={styles.preview}
             aspect={Camera.constants.Aspect.fill}>
-            <Text onPress={this.takePicture}>[CAPTURE]</Text>
+            <Button title="Capture" onPress={this.takePicture} style={styles.button}/>
           </Camera>
         </View>
+          : null}
       </View>
       </ScrollView>
     );
@@ -163,6 +177,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: 400,
     height: 400
+  },
+  button: {
+    width: 40,
+    height: 40
   }
 });
 
