@@ -82,11 +82,11 @@ export default class purple extends Component {
   takePicture() {
       const options = {};
       this.camera.capture({metadata: options})
-        .then((data) => this.setState({image: data.path}))
-        .catch(err => console.error(err));
-      this.setState({
-        showCamera: false
-      })
+        .then((data) => this.setState({
+          image: data.path,
+          showCamera: false
+        }))
+        .catch(err => console.error('ERROR IN TAKE PIC: ', err));
     }
   
   openCamera() {
