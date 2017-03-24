@@ -12,21 +12,27 @@ import {
   TouchableHighlight,
   ImagePickerIOS,
 } from 'react-native';
+const RNFS = require('react-native-fs');
+import RNFetchBlob from 'react-native-fetch-blob';
 
 export default class purple extends Component {
   constructor(props) {
     super(props);
     this.state = {
       image: null,
-      text: ''
+      text: '',
+      keywords: null,
+      urlImage: null,
     };
 
     this.sendText = this.sendText.bind(this);
     this.pickImage = this.pickImage.bind(this);
+    this.sendPhoto = this.sendPhoto.bind(this);
   }
 
   sendText() {
-    return fetch('http://127.0.0.1:8080/api/upload', {
+    this.setState({urlImage: this.state.text})
+    return fetch('http://138.197.213.36:8080/api/upload', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -38,16 +44,34 @@ export default class purple extends Component {
     })
     .then((response) => response.json())
     .then((responseJson) => {
-        console.log('RESPONSE: ', responseJson);
+      this.setState({
+        keywords: responseJson
+      });
     })
-    .catch(err => console.log('error1!!: ', err));
+    .catch(err => console.log('Error sending url to /api/upload: ', err));
+  }
+
+  sendPhoto() {
+    RNFetchBlob.fetch('POST', 
+      'http://138.197.213.36:8080/api/photo', 
+      {'Content-Type' : 'application/octet-stream',}, 
+      RNFetchBlob.wrap(this.state.image))
+    .then((response) => response.json())
+    .then((responseJson) => {
+      this.setState({
+        keywords: responseJson
+      });
+    })
+    .catch((err) => {
+      console.log('Error sending photo to /api/photo: ', err);
+    });
   }
 
   pickImage() {
     ImagePickerIOS.openSelectDialog(
       {}, 
       imageUri => {this.setState({ image: imageUri }); console.log('IMAGE: ', this.state.image)}, 
-      error => console.log(error)
+      error => console.log('Error selecting image: ', error)
     );
   }
 
@@ -60,8 +84,21 @@ export default class purple extends Component {
           onChangeText={(text) => this.setState({text})}
           value={this.state.text} placeholder="URL" />
         <Button title="Send URL" onPress={this.sendText} />
+        <View>
+         {this.state.urlImage ? <Image source={{uri : this.state.urlImage}} style={{width: 100, height: 100}}/> : null}
+       </View>
+
         <Text style={styles.section}>Choose photo from library</Text>
         <Button title="Open photo library" onPress={this.pickImage} />
+          { this.state.image ? 
+            <View>
+              <Image style={styles.image} source={{uri: this.state.image}} /> 
+              <Button title="Send photo" onPress={this.sendPhoto} />
+            </View>
+          : null}
+        <View> 
+          {this.state.keywords ? this.state.keywords.map((word) => <Text>{word.class} {word.score}</Text>) : null}
+        </View>
       </View>
     );
   }
@@ -91,6 +128,11 @@ const styles = StyleSheet.create({
     container: {
     flex: 1,
     // backgroundColor: '#1CABBD',
+  },
+  image: {
+    width: 100,
+    height: 100,
+    margin: 10,
   }
 });
 
