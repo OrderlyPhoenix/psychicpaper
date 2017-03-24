@@ -12,6 +12,8 @@ import {
   TouchableHighlight,
   ImagePickerIOS,
 } from 'react-native';
+const RNFS = require('react-native-fs');
+import RNFetchBlob from 'react-native-fetch-blob';
 
 export default class purple extends Component {
   constructor(props) {
@@ -46,18 +48,30 @@ export default class purple extends Component {
         keywords: responseJson
       });
     })
-    .catch(err => console.log('error1!!: ', err));
+    .catch(err => console.log('Error sending url to /api/upload: ', err));
   }
 
   sendPhoto() {
-    console.log('yay');
+    RNFetchBlob.fetch('POST', 
+      'http://138.197.213.36:8080/api/photo', 
+      {'Content-Type' : 'application/octet-stream',}, 
+      RNFetchBlob.wrap(this.state.image))
+    .then((response) => response.json())
+    .then((responseJson) => {
+      this.setState({
+        keywords: responseJson
+      });
+    })
+    .catch((err) => {
+      console.log('Error sending photo to /api/photo: ', err);
+    });
   }
 
   pickImage() {
     ImagePickerIOS.openSelectDialog(
       {}, 
       imageUri => {this.setState({ image: imageUri }); console.log('IMAGE: ', this.state.image)}, 
-      error => console.log(error)
+      error => console.log('Error selecting image: ', error)
     );
   }
 
