@@ -18,7 +18,9 @@ export default class purple extends Component {
     super(props);
     this.state = {
       image: null,
-      text: ''
+      urlImage: null,
+      text: '',
+      keywords: []
     };
 
     this.sendText = this.sendText.bind(this);
@@ -26,7 +28,8 @@ export default class purple extends Component {
   }
 
   sendText() {
-    return fetch('http://127.0.0.1:8080/api/upload', {
+    this.setState({urlImage: this.state.text})
+    return fetch('http://138.197.213.36:8080/api/upload', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -39,6 +42,7 @@ export default class purple extends Component {
     .then((response) => response.json())
     .then((responseJson) => {
         console.log('RESPONSE: ', responseJson);
+        this.setState({keywords: responseJson})
     })
     .catch(err => console.log('error1!!: ', err));
   }
@@ -62,10 +66,17 @@ export default class purple extends Component {
         <Button title="Send URL" onPress={this.sendText} />
         <Text style={styles.section}>Choose photo from library</Text>
         <Button title="Open photo library" onPress={this.pickImage} />
+        <View style={styles.container}>
+          {this.state.keywords ? this.state.keywords.map((word) => <Text>{word.class} {word.score}</Text>): null}
+          <View>
+          {this.state.urlImage ? <Image source={{uri : this.state.urlImage}} style={{width: 100, height: 100}}/> : null}
+          </View>
+        </View>
       </View>
     );
   }
 }
+
 
 const styles = StyleSheet.create({
   main: {
